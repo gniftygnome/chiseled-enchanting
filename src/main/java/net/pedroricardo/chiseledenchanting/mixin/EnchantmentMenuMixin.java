@@ -36,12 +36,13 @@ import java.util.stream.Collectors;
 @Mixin(EnchantmentMenu.class)
 public class EnchantmentMenuMixin {
     @Shadow @Final private RandomSource random;
+
     @Unique
     private final List<EnchantmentInstance> possibleEnchantments = new ArrayList<>();
     @Unique
     private int bookAmount = 0;
 
-    @Inject(method = "method_17411", at = @At(value = "HEAD"))
+    @Inject(method = "lambda$slotsChanged$0", at = @At(value = "HEAD"))
     private void chiseledenchanting$getEnchantments(ItemStack itemStack, Level world, BlockPos tablePos, CallbackInfo ci) {
         this.possibleEnchantments.clear();
         this.bookAmount = 0;
@@ -64,7 +65,10 @@ public class EnchantmentMenuMixin {
         }
     }
 
-    @WrapOperation(method = "method_17411", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/EnchantingTableBlock;isValidBookShelf(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;)Z"))
+    @WrapOperation(
+            method = "lambda$slotsChanged$0",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/EnchantingTableBlock;isValidBookShelf(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;)Z")
+    )
     private boolean chiseledenchanting$chiseledBookshelfProvidesPower(Level world, BlockPos tablePos, BlockPos providerOffset, Operation<Boolean> original) {
         if (!original.call(world, tablePos, providerOffset)) return false;
         if (!(world.getBlockEntity(tablePos.offset(providerOffset)) instanceof ChiseledBookShelfBlockEntity bookshelf)) return true;
